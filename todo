@@ -1,0 +1,108 @@
+#!/usr/bin/python
+
+import sys
+import os
+import re
+
+#Define function to return recursive list of files
+def get_recursive_filepaths(directory):
+
+    file_paths = []  # List which will store all of the full filepaths.
+
+    # Walk the tree.
+    for root, directories, files in os.walk(directory):
+        for filename in files:
+        	# Join the two strings in order to form the full filepath.
+        	filepath = os.path.join(root, filename)
+        	file_paths.append(filepath)  # Add it to the list.
+
+    return file_paths  # Self-explanatory.
+
+#Define function to return list of files in directory
+def get_filepaths(directory):
+	file_paths = next(os.walk(directory))[2]
+	return file_paths
+
+#Remove backup files (~) from the list
+def remove_backup_files(file_paths):
+	for f in file_paths:
+		regex = re.compile(".*\.?.*~")
+		m = regex.search(f)
+		if m:
+			file_paths.remove(f)
+
+#Remove any un-openable files from the list
+def remove_unopenable_files(file_paths):
+	for f in file_paths:
+		try:
+			fd = open(f)
+		except IOError as e:
+			file_paths.remove(f)
+
+#Search for the REGEX /@TODO/
+def containsTODO(f):
+	contains = False
+	fd = open(f)
+	for line in fd:
+		regex = re.compile("@TODO")
+		if regex.search(line):
+			return True
+	return False
+
+#Print the formatted matching lines
+def printTODOs(f):
+	fd = open(f)
+	linenum = 1
+	for line in fd:
+		regex = re.compile("@TODO\s*(.*)")
+		m = regex.search(line)
+		if m:
+			print("\t line %-5d: @TODO   --  %s" % (linenum, m.group(1)))
+
+		linenum += 1
+	print ""
+
+#Determine arguments
+if (len(sys.argv) - 1) == 0:
+	recursive = False
+	directory = "."
+	
+elif (len(sys.argv) - 1) == 1:
+	if sys.argv[1] == '-r':
+		recursive = True
+		directory = "."
+	else:
+		recursive = False
+		directory = sys.argv[1]
+		
+elif (len(sys.argv) - 1) == 2:
+	if sys.argv[1] == '-r':
+		recursive = True
+	else:
+		recursive = False
+		sys.exit("@usage: todo [-r] [directory]") 
+	
+	directory = sys.argv[2]
+
+else:
+	sys.exit("@usage: todo [-r] [directory]") 
+
+#Obtain list of files to parse
+if recursive:  
+	file_paths = get_recursive_filepaths(directory)
+else:
+	file_paths = get_filepaths(directory)	
+
+#Remove backup files
+remove_backup_files(file_paths)
+
+#Remove unopenable files
+remove_unopenable_files(file_paths)
+
+####################################################
+
+#Main Loop...
+for f in file_paths:
+	if containsTODO(f):
+		print f + ": "
+		printTODOs(f)
