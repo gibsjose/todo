@@ -31,4 +31,4 @@ todo [-r] [directory]
 
 The optional `-r` option will search the directory recursively for matching files
 
-The optional `directory` is used to specify the directory to search. Defaults to `.`.
+The optional `directory` is used to specify the directory to search. Defaults to the current directory.
