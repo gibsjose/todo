@@ -1,8 +1,37 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+"""todo: simple @TODO tracker
+
+Usage:
+    todo [-r] [<directory>]
+    todo (-h | --help)
+    todo (-v | --version)
+
+Options:
+    -h --help       Show this screen.
+    -v --version    Show version.
+    -r              Check recursively
+    directory       Directory to check (defaults to current)
+
+"""
+
+#   todo
+#   Simple @TODO tracker
+#
+#   02 Jan 2016
+#
+#   Joe Gibson (gibsjose@mail.gvsu.edu)
+#
+#   License: MIT (http://gibsjose.mit-license.org)
+#
+#   https://gibsjose.com
+#   https://github.com/gibsjose/todo
 
 import sys
 import os
+import traceback
+import time
 import re
+from docopt import docopt
 
 #Define function to return recursive list of files
 def get_recursive_filepaths(directory):
@@ -60,49 +89,43 @@ def printTODOs(f):
 			print("\t line %-5d: @TODO   --  %s" % (linenum, m.group(1)))
 
 		linenum += 1
-	print ""
+	print('')
 
-#Determine arguments
-if (len(sys.argv) - 1) == 0:
-	recursive = False
-	directory = "."
-	
-elif (len(sys.argv) - 1) == 1:
-	if sys.argv[1] == '-r':
-		recursive = True
-		directory = "."
-	else:
-		recursive = False
-		directory = sys.argv[1]
-		
-elif (len(sys.argv) - 1) == 2:
-	if sys.argv[1] == '-r':
-		recursive = True
-	else:
-		recursive = False
-		sys.exit("@usage: todo [-r] [directory]") 
-	
-	directory = sys.argv[2]
+def main():
+    recursive = arguments['-r']
+    directory = arguments['<directory>'] if arguments['<directory>'] else '.'
 
-else:
-	sys.exit("@usage: todo [-r] [directory]") 
+    #Obtain list of files to parse
+    if recursive:
+    	file_paths = get_recursive_filepaths(directory)
+    else:
+    	file_paths = get_filepaths(directory)
 
-#Obtain list of files to parse
-if recursive:  
-	file_paths = get_recursive_filepaths(directory)
-else:
-	file_paths = get_filepaths(directory)	
+    #Remove backup files
+    remove_backup_files(file_paths)
 
-#Remove backup files
-remove_backup_files(file_paths)
+    #Remove unopenable files
+    remove_unopenable_files(file_paths)
 
-#Remove unopenable files
-remove_unopenable_files(file_paths)
+    #Main Loop...
+    for f in file_paths:
+    	if containsTODO(f):
+    		print(f + ': ')
+    		printTODOs(f)
 
-####################################################
+if __name__ == '__main__':
+    try:
+        global arguments
+        arguments = docopt(__doc__, version='todo 1.0.0')
+        main()
+        sys.exit(0)
 
-#Main Loop...
-for f in file_paths:
-	if containsTODO(f):
-		print f + ": "
-		printTODOs(f)
+    except KeyboardInterrupt as e: # Ctrl-C
+        raise e
+    except SystemExit as e: # sys.exit()
+        raise e
+    except Exception as e:
+        print('Error: Unexpected Exception')
+        print(str(e))
+        traceback.print_exc()
+        os._exit(1)

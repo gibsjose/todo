@@ -1,0 +1,20 @@
+{
+    "authors": [
+        {
+            "email": "gibsjose@mail.gvsu.edu",
+            "name": "Joe Gibson"
+        }
+    ],
+    "description": "Simple @TODO tracker",
+    "git": true,
+    "git-push": false,
+    "git-remote": "https://github.com/gibsjose/todo",
+    "language": "python",
+    "license": "MIT",
+    "license-url": "http://gibsjose.mit-license.org",
+    "project": "todo",
+    "websites": [
+        "https://gibsjose.com",
+        "https://github.com/gibsjose/todo"
+    ]
+}
