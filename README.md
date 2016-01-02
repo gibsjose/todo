@@ -1,10 +1,5 @@
 # Todo
- 
-## Authors
-@gibsjose
-
-## Description
-Todo is a simple Python script that matches files containing the popular `@TODO` tag. It displays the comment after the tag from all files containing tags, with corresponding file names and line numbers.
+Todo is a simple `@TODO` tag tracker. It displays the comment after the tag from all files containing tags, with corresponding file names and line numbers.
 
 For example, a file named `main.c` containing the following tag on line 100:
 
@@ -21,8 +16,11 @@ main.c:
 		line 100  :	 @TODO  --  Use comprehensible variable names
 ```
 
-## Installation 
-There is none! Just make sure the location of the script is in your $PATH variable. I suggest using `~/bin/todo`.
+## Installation
+```bash
+brew tap gibsjose/utils
+brew install todo
+```
 
 ## Usage
 ```bash
